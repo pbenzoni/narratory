@@ -15,6 +15,7 @@ import requests
 from bs4 import BeautifulSoup
 import io
 import re
+from multiprocessing import Pool
 
 import nltk
 nltk.download('punkt')
@@ -421,6 +422,21 @@ def speechify_text(text):
     trim_samples = int(0.1 * 24000) 
     wav = wav[:-trim_samples]
     return wav
+
+def process_chunk(text):
+    print("Processing:", text)
+    try:
+        return speechify_text(text)
+    except:
+        # Further chunking and processing as needed
+        texts_split = chunk_text(text, char_limit=200)
+        wavs = []
+        for text_chunk in texts_split:
+            try:
+                wavs.append(speechify_text(text_chunk))
+            except:
+                continue
+        return np.concatenate(wavs) if wavs else None
       
 
 ### ROUTES AND MAIN APP ###
@@ -440,17 +456,8 @@ def convert():
     print("Beginning Audiation:", text_chunks[0])
 
     wavs = []
-    for idx,text in enumerate(text_chunks):
-        print(f"Processing chunk {idx+1}/{len(text_chunks)}")
-        try:
-            wavs.append(speechify_text(text))
-        except:
-            texts_split = chunk_text(text, char_limit=200)
-            for text_chunk in texts_split:
-                try:
-                    wavs.append(speechify_text(text_chunk))
-                except:
-                    continue
+    with Pool(processes=4) as pool:  # Adjust the number of processes based on your CPU cores and GPU load
+        wavs = pool.map(process_chunk, text_chunks)
 
     output_audio = np.concatenate(wavs)
     buffer = io.BytesIO()
