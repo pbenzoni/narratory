@@ -46,8 +46,7 @@ from models import *
 from utils import *
 from text_utils import TextCleaner
 textclenaer = TextCleaner()
-
-
+app = Flask(__name__)
 
 ### TTS FUNCTIONS ###
 to_mel = torchaudio.transforms.MelSpectrogram(
@@ -463,3 +462,6 @@ def convert():
     buffer.seek(0)
 
     return send_file(buffer, as_attachment=True, download_name='output.wav', mimetype='audio/wav')
+
+if __name__ == '__main__':
+    app.run(debug=True)
