@@ -413,6 +413,15 @@ def chunk_text(text, char_limit=400, word_limit=500):
 
     return chunks
 
+def speechify_text(text):
+    start = time.time()
+    wav = inference(text, ref_s, alpha=0.3, beta=0.7, diffusion_steps=5, embedding_scale=1)
+    rtf = (time.time() - start) / (len(wav) / 24000)
+    # Trim the last tenth of a second to get rid of a weird crash
+    trim_samples = int(0.1 * 24000) 
+    wav = wav[:-trim_samples]
+    return wav
+      
 
 ### ROUTES AND MAIN APP ###
 
@@ -428,22 +437,11 @@ def convert():
     elif 'archiveofourown' in url:
         text = load_text_from_ao3(url)
     text_chunks = chunk_text(text)
+    print("Beginning Audiation:", text_chunks[0])
 
-    def speechify_text(text):
-      start = time.time()
-      wav = inference(text, ref_s, alpha=0.3, beta=0.7, diffusion_steps=5, embedding_scale=1)
-      rtf = (time.time() - start) / (len(wav) / 24000)
-      # Trim the last tenth of a second to get rid of a weird crash
-      trim_samples = int(0.1 * 24000) 
-      wav = wav[:-trim_samples]
-      return wav
-      
-
-    # reference_dicts = {}
-    # reference_dicts['696_92939'] = "Demo/reference_audio/908-157963-0027.wav"
     wavs = []
-    
-    for text in text_chunks:
+    for idx,text in enumerate(text_chunks):
+        print(f"Processing chunk {idx+1}/{len(text_chunks)}")
         try:
             wavs.append(speechify_text(text))
         except:
