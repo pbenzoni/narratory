@@ -14,6 +14,7 @@ from flask import Flask, render_template, request, send_file
 import requests
 from bs4 import BeautifulSoup
 import io
+import re
 
 import nltk
 nltk.download('punkt')
@@ -440,7 +441,6 @@ def convert():
 
     # reference_dicts = {}
     # reference_dicts['696_92939'] = "Demo/reference_audio/908-157963-0027.wav"
-    noise = torch.randn(1,1,256).to(device)
     wavs = []
     
     for text in text_chunks:
@@ -454,9 +454,7 @@ def convert():
                 except:
                     continue
 
-    ref_s = compute_style("goblins.wav")  # You need to set up reference audio file or choose a method to get it
-    output_audio = inference(text, ref_s)
-
+    output_audio = np.concatenate(wavs)
     buffer = io.BytesIO()
     torchaudio.save(buffer, torch.tensor(output_audio).unsqueeze(0), 24000, format='wav')
     buffer.seek(0)
@@ -464,4 +462,4 @@ def convert():
     return send_file(buffer, as_attachment=True, download_name='output.wav', mimetype='audio/wav')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=80)
