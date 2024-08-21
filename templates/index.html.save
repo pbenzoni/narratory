@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to Speech Streaming</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">Text to Speech Streaming</h1>
+        <form method="POST" action="/">
+            <div class="form-group">
+                <label for="url">Enter URL:</label>
+                <input type="url" class="form-control" id="url" name="url" placeholder="Enter the URL" required>
+            </div>
+            <div class="form-group">
+                <label for="source">Select Source:</label>
+                <select class="form-control" id="source" name="source">
+                    <option value="royalroad">Royal Road</option>
+                    <option value="ao3">AO3 (Archive of Our Own)</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Stream Audio</button>
+        </form>
+div>
+</body>
+</html>
